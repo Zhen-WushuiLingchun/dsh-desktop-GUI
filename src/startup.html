@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DSH Desktop</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --ink: #f0eee7;
+        --muted: #98a4b4;
+        --panel: rgba(12, 22, 37, 0.78);
+        --stroke: rgba(142, 162, 238, 0.24);
+        --accent: #8ea2ee;
+        --teal: #29d3c2;
+        font-family: "Bahnschrift", "Segoe UI Variable", "Microsoft YaHei UI", sans-serif;
+      }
+
+      * { box-sizing: border-box; }
+
+      html, body { width: 100%; height: 100%; margin: 0; }
+
+      body {
+        overflow: hidden;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at 72% 20%, rgba(41, 211, 194, 0.09), transparent 28%),
+          radial-gradient(circle at 24% 70%, rgba(142, 162, 238, 0.12), transparent 34%),
+          #07111f;
+      }
+
+      .orbit,
+      .orbit::before,
+      .orbit::after {
+        position: absolute;
+        inset: 50% auto auto 50%;
+        border: 1px solid rgba(142, 162, 238, 0.15);
+        border-radius: 50%;
+        content: "";
+        pointer-events: none;
+      }
+
+      .orbit {
+        width: 820px;
+        height: 280px;
+        transform: translate(-50%, -50%) rotate(-12deg);
+      }
+
+      .orbit::before { width: 620px; height: 210px; transform: translate(-50%, -50%); }
+      .orbit::after { width: 1020px; height: 350px; transform: translate(-50%, -50%); }
+
+      main {
+        position: relative;
+        z-index: 1;
+        display: grid;
+        place-items: center;
+        width: 100%;
+        height: 100%;
+        padding: 40px;
+      }
+
+      .panel {
+        display: grid;
+        grid-template-columns: 118px minmax(0, 1fr);
+        gap: 30px;
+        width: min(720px, 100%);
+        padding: 34px;
+        border: 1px solid var(--stroke);
+        border-radius: 24px;
+        background: var(--panel);
+        box-shadow: 0 28px 90px rgba(0, 0, 0, 0.42), inset 0 1px rgba(255, 255, 255, 0.035);
+        backdrop-filter: blur(22px);
+      }
+
+      .icon-wrap {
+        position: relative;
+        align-self: start;
+        width: 118px;
+        height: 118px;
+      }
+
+      .icon-wrap::after {
+        position: absolute;
+        inset: -8px;
+        border: 1px solid rgba(41, 211, 194, 0.2);
+        border-radius: 30px;
+        content: "";
+        animation: breathe 2.4s ease-in-out infinite;
+      }
+
+      .icon {
+        display: block;
+        width: 118px;
+        height: 118px;
+        border-radius: 27px;
+        box-shadow: 0 18px 44px rgba(0, 0, 0, 0.35);
+      }
+
+      .eyebrow {
+        margin: 2px 0 12px;
+        color: var(--teal);
+        font-size: 12px;
+        font-weight: 650;
+        letter-spacing: 0.17em;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        margin: 0;
+        font-family: "Candara", "Microsoft YaHei UI", sans-serif;
+        font-size: clamp(30px, 5vw, 45px);
+        font-weight: 650;
+        letter-spacing: -0.035em;
+      }
+
+      .lead {
+        margin: 12px 0 0;
+        color: var(--muted);
+        font-size: 15px;
+        line-height: 1.65;
+      }
+
+      .status {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 24px;
+        padding: 9px 13px;
+        border: 1px solid rgba(142, 162, 238, 0.18);
+        border-radius: 999px;
+        color: #c9d2f7;
+        background: rgba(142, 162, 238, 0.08);
+        font-size: 13px;
+      }
+
+      .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--teal);
+        box-shadow: 0 0 0 5px rgba(41, 211, 194, 0.1);
+        animation: pulse 1.4s ease-in-out infinite;
+      }
+
+      .detail {
+        display: none;
+        max-height: 210px;
+        margin: 20px 0 0;
+        padding: 14px 16px;
+        overflow: auto;
+        border: 1px solid rgba(255, 125, 125, 0.24);
+        border-radius: 12px;
+        color: #f2c7c7;
+        background: rgba(66, 20, 28, 0.36);
+        font: 12px/1.55 "Cascadia Mono", Consolas, monospace;
+        white-space: pre-wrap;
+      }
+
+      .help {
+        display: none;
+        margin-top: 18px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .help a { color: var(--accent); text-underline-offset: 3px; }
+
+      body.error .panel { border-color: rgba(255, 125, 125, 0.25); }
+      body.error .icon-wrap::after { border-color: rgba(255, 125, 125, 0.28); animation: none; }
+      body.error .status { color: #f2c7c7; border-color: rgba(255, 125, 125, 0.2); background: rgba(66, 20, 28, 0.28); }
+      body.error .dot { background: #ff7d7d; box-shadow: 0 0 0 5px rgba(255, 125, 125, 0.1); animation: none; }
+      body.error .detail, body.error .help { display: block; }
+
+      @keyframes pulse {
+        0%, 100% { opacity: 0.45; transform: scale(0.86); }
+        50% { opacity: 1; transform: scale(1); }
+      }
+
+      @keyframes breathe {
+        0%, 100% { opacity: 0.35; transform: scale(0.98); }
+        50% { opacity: 0.9; transform: scale(1.02); }
+      }
+
+      @media (max-width: 640px) {
+        .panel { grid-template-columns: 1fr; text-align: center; }
+        .icon-wrap { margin: auto; }
+        .status { justify-content: center; }
+        .detail, .help { text-align: left; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="orbit" aria-hidden="true"></div>
+    <main>
+      <section class="panel" aria-live="polite">
+        <div class="icon-wrap">
+          <img class="icon" src="../assets/app-icon.png" alt="">
+        </div>
+        <div>
+          <p class="eyebrow">Local workbench</p>
+          <h1 id="title">正在连接 DSH</h1>
+          <p class="lead" id="lead">启动本地 Web 服务，并加载与你浏览器中完全相同的工作区、会话、插件和外观配置。</p>
+          <div class="status"><span class="dot"></span><span id="status">正在检查 127.0.0.1:3080</span></div>
+          <pre class="detail" id="detail"></pre>
+          <p class="help">请确认 <code>dsh</code> 已加入 PATH，或查看 <a href="https://github.com/Zhen-WushuiLingchun/dsh-desktop-GUI#故障排查" target="_blank" rel="noreferrer">故障排查文档</a>。修复后关闭并重新打开应用。</p>
+        </div>
+      </section>
+    </main>
+    <script>
+      const params = new URLSearchParams(window.location.search)
+      if (params.get('state') === 'error') {
+        document.body.classList.add('error')
+        document.getElementById('title').textContent = 'DSH 启动失败'
+        document.getElementById('lead').textContent = '桌面窗口仍然可用；下面保留了本次启动诊断，现有 DSH 配置和会话未被修改。'
+        document.getElementById('status').textContent = '需要处理后重启'
+        document.getElementById('detail').textContent = params.get('detail') || '未返回进一步诊断。'
+      }
+    </script>
+  </body>
+</html>
