@@ -1,0 +1,2 @@
+# Normalize line endings across Windows checkout and GitHub clones.
+* text=auto eol=lf

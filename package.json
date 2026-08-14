@@ -1,0 +1,14 @@
+{
+  "name": "dsh-desktop-gui",
+  "description": "A desktop (Electron) wrapper for the DeepSeek Harness browser GUI: launches the web backend, opens it in a native window, and tears it down on close.",
+  "version": "0.1.0",
+  "license": "MIT",
+  "type": "module",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "dependencies": {
+    "electron": "^33.0.0"
+  }
+}
