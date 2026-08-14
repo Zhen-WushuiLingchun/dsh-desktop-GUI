@@ -24,6 +24,17 @@ npm start     # or: pnpm start
 
 On first run the web backend initializes its profile and binds `127.0.0.1:3080`. If that port is already in use by a running harness web server, the app reuses it instead of starting a second one (and will not kill it on close).
 
+## Package (Windows installer)
+
+```sh
+pnpm install
+pnpm dist   # electron-builder --win (NSIS)
+```
+
+The installer lands in `dist/DeepSeek Harness Desktop Setup <version>.exe`, with the unpacked app under `dist/win-unpacked/`. The NSIS installer creates desktop and start-menu shortcuts.
+
+> **Note:** `electron-builder` 26.15.x references `ElectronDownloadCacheMode`, which only exists in `@electron/get` v4+, while still declaring `@electron/get@^3.0.0`. This repo pins that request to v4 via the `overrides` entry in `pnpm-workspace.yaml`; keep it until upstream fixes the dependency range.
+
 ## How it works
 
 `src/main.js` is a plain Electron main process:
@@ -36,6 +47,5 @@ On first run the web backend initializes its profile and binds `127.0.0.1:3080`.
 
 ## Known Limitations and Deferred Work
 
-- **No bundling yet** — the app runs from source via `electron .`; it does not produce a packaged installer (`.exe`/`.dmg`). `electron-builder` packaging is deferred.
 - **Fixed port** — it assumes the harness web default `127.0.0.1:3080`; a running server on another port is not discovered automatically.
 - **Reuses a pre-existing server** — if `3080` is already answering, the app attaches to it and leaves it running on close (it only tears down a server it started).

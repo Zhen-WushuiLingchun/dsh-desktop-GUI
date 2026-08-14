@@ -1,0 +1,8 @@
+allowBuilds:
+  electron: true
+  electron-winstaller: true
+
+overrides:
+  # app-builder-lib 26.15.x references ElectronDownloadCacheMode (added in
+  # @electron/get v4) but still declares "^3.0.0"; pin the v3 requests to v4.
+  "@electron/get@^3.0.0": 4.0.3
