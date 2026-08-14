@@ -62,6 +62,14 @@ The recommended setup is to install Node and DSH according to the DeepSeek Harne
 
 Download `DSH-Desktop-Setup-<version>.exe` from [Releases](https://github.com/Zhen-WushuiLingchun/dsh-desktop-GUI/releases). The NSIS installer supports a custom installation directory and creates desktop and Start menu shortcuts.
 
+Before showing the installation wizard, the installer runs `dsh --version` without opening a console. If DSH is missing, cannot run in the current Node environment, or the installer has not inherited a recently changed PATH, it offers three choices:
+
+- **Abort** exits so Node.js and DeepSeek Harness can be installed or repaired first.
+- **Retry** runs the preflight check again.
+- **Ignore** continues only when `dsh --version` is already known to work in a fresh PowerShell.
+
+The installer never installs or changes Node, DSH, `$DSH_HOME`, model credentials, or conversations. After the check, the directory page can install DSH Desktop to any accessible local drive and folder.
+
 Community builds are currently unsigned, so Windows SmartScreen may show an unknown-publisher warning. Download only from this repository's release page.
 
 Run from source:
