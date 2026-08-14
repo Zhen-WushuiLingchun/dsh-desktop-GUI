@@ -80,6 +80,14 @@ DSH-Desktop-Setup-<version>.exe
 
 安装器支持选择安装目录，并创建桌面与开始菜单快捷方式。当前社区构建未做商业代码签名，Windows SmartScreen 可能提示“未知发布者”；请只从本仓库 Release 下载并核对文件信息。
 
+进入安装向导时，安装器会在隐藏窗口中执行一次 `dsh --version`。若 DSH 未安装、Node 环境不能运行 DSH，或安装器尚未读取到最新 PATH，会显示“中止 / 重试 / 忽略”提示：
+
+- **中止**：退出安装，先配置 Node.js 与 DeepSeek Harness；
+- **重试**：修复环境后重新检测；
+- **忽略**：仅在确认 `dsh --version` 已能在新的 PowerShell 中运行时继续。
+
+安装器不会自动安装或修改 Node、DSH、`$DSH_HOME`、模型密钥或会话。检测通过后可以在目录选择页面把 DSH Desktop 安装到有权限访问的任意本地磁盘和文件夹。
+
 ### 从源码运行
 
 ```powershell
