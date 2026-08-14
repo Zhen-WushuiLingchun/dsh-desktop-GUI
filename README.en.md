@@ -48,6 +48,16 @@ The local state page appears only while connecting or after a startup failure. O
 
 DSH Desktop does not bundle Node, model credentials, or a DSH home. It uses your existing installation and `$DSH_HOME` without copying conversations.
 
+### Why Node and DSH remain system dependencies
+
+This is an intentional runtime boundary rather than a missing feature:
+
+- `dsh` is a Node.js application and should run on a system Node version supported by DeepSeek Harness. Electron's embedded runtime serves the desktop window; it is not a replacement runtime for the external DSH CLI.
+- Desktop and browser access connect to the same DSH Host, `$DSH_HOME`, and WebUI. Workspaces, conversations, plugins, models, and appearance settings therefore remain aligned without a separate synchronization layer.
+- Bundling another independent DSH installation inside the shell could create duplicate installations, separate homes, plugin-version drift, and conflicting configuration.
+
+The recommended setup is to install Node and DSH according to the DeepSeek Harness requirements, then use DSH Desktop as the native window entry point. CLI, browser, and desktop access continue to operate on the same underlying data.
+
 ## Install
 
 Download `DSH-Desktop-Setup-<version>.exe` from [Releases](https://github.com/Zhen-WushuiLingchun/dsh-desktop-GUI/releases). The NSIS installer supports a custom installation directory and creates desktop and Start menu shortcuts.
@@ -133,9 +143,9 @@ Confirm that the WebUI itself restores the theme at `http://127.0.0.1:3080` and 
 
 If DSH was already running before the desktop app started, this is expected. The wrapper never stops a service it did not create.
 
-## Deferred work
+## Design boundaries and optional future work
 
-- Bundled or automatic DeepSeek Harness installation/update.
+- DSH installation and updates remain external by default to avoid creating a second DSH runtime.
 - Remote URL and port selection UI.
 - Commercial code signing and unattended in-app installation.
 - Window size and position persistence.
