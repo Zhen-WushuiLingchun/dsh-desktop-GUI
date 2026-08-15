@@ -29,7 +29,8 @@ The local state page appears only while connecting or after a startup failure. O
 
 ## Highlights
 
-- Validates and reuses an existing DSH WebUI on `127.0.0.1:3080`.
+- Validates and reuses only a complete DSH WebUI document on `127.0.0.1:3080`.
+- Bypasses stale dynamic index entries on the native window's first navigation so boot scripts or styles cannot become visible page text after a restart.
 - Starts the Windows backend with `windowsHide`, so no CMD window appears.
 - Uses a single application instance and focuses the existing window on a second launch.
 - Stops only the DSH process tree created by this desktop instance.
