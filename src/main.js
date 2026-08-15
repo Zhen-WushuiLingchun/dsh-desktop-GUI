@@ -11,6 +11,7 @@ import { dirname, join } from 'node:path'
 import { app, BrowserWindow, dialog, shell } from 'electron'
 
 import { fetchLatestRelease, isNewerVersion } from './update.js'
+import { dshNavigationUrl, probeDshServer } from './webui.js'
 
 const currentDirectory = dirname(fileURLToPath(import.meta.url))
 const DSH_COMMAND = 'dsh'
@@ -19,7 +20,6 @@ const DEFAULT_URL = 'http://127.0.0.1:3080'
 const READY_TIMEOUT_MS = 30_000
 const PROBE_TIMEOUT_MS = 1_500
 const MAX_DIAGNOSTIC_CHARS = 16_000
-const DSH_BOOT_MARKER = 'window.__DSH_BOOT__'
 const APP_ID = 'dev.dsh.desktopgui'
 const UPDATE_TIMEOUT_MS = 5_000
 
@@ -72,31 +72,12 @@ function hasDsh() {
   return probe.error === undefined && probe.status === 0
 }
 
-/** Return true only when `url` serves a recognizable DSH WebUI document. */
-async function probeDshServer(url) {
-  const controller = new AbortController()
-  const timeout = setTimeout(() => controller.abort(), PROBE_TIMEOUT_MS)
-  try {
-    const response = await fetch(url, {
-      method: 'GET',
-      cache: 'no-store',
-      signal: controller.signal,
-    })
-    if (!response.ok) return false
-    return (await response.text()).includes(DSH_BOOT_MARKER)
-  } catch {
-    return false
-  } finally {
-    clearTimeout(timeout)
-  }
-}
-
 /** Poll until a DSH WebUI answers, the child exits, or the deadline passes. */
 async function waitForServer(url, timeoutMs) {
   const deadline = Date.now() + timeoutMs
   while (Date.now() < deadline) {
     if (backendExitError !== null) throw backendExitError
-    if (await probeDshServer(url)) return
+    if (await probeDshServer(url, { timeoutMs: PROBE_TIMEOUT_MS })) return
     await new Promise(resolve => setTimeout(resolve, 300))
   }
   throw new Error(`DSH WebUI did not start at ${url} within ${Math.round(timeoutMs / 1000)} seconds.`)
@@ -104,11 +85,11 @@ async function waitForServer(url, timeoutMs) {
 
 /** Reuse an existing DSH server, otherwise start one without a console window. */
 async function ensureBackend() {
-  if (backend !== null && serverReady && await probeDshServer(DEFAULT_URL)) {
+  if (backend !== null && serverReady && await probeDshServer(DEFAULT_URL, { timeoutMs: PROBE_TIMEOUT_MS })) {
     return { reused: false }
   }
 
-  if (await probeDshServer(DEFAULT_URL)) {
+  if (await probeDshServer(DEFAULT_URL, { timeoutMs: PROBE_TIMEOUT_MS })) {
     serverReady = true
     ownsBackend = false
     return { reused: true }
@@ -287,7 +268,10 @@ async function boot() {
   try {
     await ensureBackend()
     if (mainWindow !== null && !mainWindow.isDestroyed()) {
-      await mainWindow.loadURL(DEFAULT_URL)
+      const navigationUrl = dshNavigationUrl(DEFAULT_URL, `${Date.now().toString(36)}-${process.pid.toString(36)}`)
+      await mainWindow.loadURL(navigationUrl, {
+        extraHeaders: 'Cache-Control: no-cache\r\nPragma: no-cache',
+      })
       mainWindow.show()
       void checkForUpdates()
     }

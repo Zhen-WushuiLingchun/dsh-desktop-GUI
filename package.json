@@ -15,7 +15,7 @@
   "type": "module",
   "main": "src/main.js",
   "scripts": {
-    "check": "node --check src/main.js && node --check src/update.js && node --test test/*.test.js",
+    "check": "node --check src/main.js && node --check src/update.js && node --check src/webui.js && node --test test/*.test.js",
     "start": "electron .",
     "dist": "electron-builder --win"
   },
