@@ -31,6 +31,7 @@ The local state page appears only while connecting or after a startup failure. O
 
 - Validates and reuses only a complete DSH WebUI document on `127.0.0.1:3080`.
 - Bypasses stale dynamic index entries on the native window's first navigation so boot scripts or styles cannot become visible page text after a restart.
+- Keeps that compatibility entirely in the desktop shell; no DeepSeek Harness fork or server patch is required.
 - Starts the Windows backend with `windowsHide`, so no CMD window appears.
 - Uses a single application instance and focuses the existing window on a second launch.
 - Stops only the DSH process tree created by this desktop instance.
@@ -48,6 +49,8 @@ The local state page appears only while connecting or after a startup failure. O
 - The default Web profile and `http://127.0.0.1:3080` endpoint.
 
 DSH Desktop does not bundle Node, model credentials, or a DSH home. It uses your existing installation and `$DSH_HOME` without copying conversations.
+
+An official, unmodified DeepSeek Harness installation is sufficient. Even when its dynamic index has no cache-control response header, DSH Desktop performs an independent readiness probe and uses a unique first-navigation URL to fetch the current complete document.
 
 ### Why Node and DSH remain system dependencies
 
@@ -103,6 +106,7 @@ The desktop-specific surface is intentionally small:
 ```text
 src/main.js         probing, hidden launch, ownership, windowing, safe navigation
 src/update.js       GitHub Release query and semantic version comparison
+src/webui.js        complete-document validation and first-navigation cache isolation
 src/startup.html    startup and bounded error state matching the WebUI palette
 assets/app-icon.png shared executable, installer, shortcut, window, and README icon
 ```

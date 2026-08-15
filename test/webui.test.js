@@ -24,14 +24,16 @@ test('probe rejects a successful response containing raw boot text', async () =>
   assert.equal(await probeDshServer('http://127.0.0.1:3080', { fetchImpl }), false)
 })
 
-test('probe accepts a complete DSH document and disables request caching', async () => {
+test('probe accepts an official-style complete DSH document without server cache headers', async () => {
   let observedOptions
+  const response = new Response(VALID_DOCUMENT, {
+    status: 200,
+    headers: { 'content-type': 'text/html; charset=utf-8' },
+  })
+  assert.equal(response.headers.has('cache-control'), false)
   const fetchImpl = async (_url, options) => {
     observedOptions = options
-    return new Response(VALID_DOCUMENT, {
-      status: 200,
-      headers: { 'content-type': 'text/html; charset=utf-8' },
-    })
+    return response
   }
   assert.equal(await probeDshServer('http://127.0.0.1:3080', { fetchImpl }), true)
   assert.equal(observedOptions.cache, 'no-store')
