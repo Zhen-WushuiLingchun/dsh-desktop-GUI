@@ -41,6 +41,7 @@ DSH Desktop 把本机 DeepSeek Harness WebUI 放进独立的原生窗口：启�
 
 - **真正复用现有服务**：先验证 `127.0.0.1:3080` 返回完整且结构有效的 DSH WebUI，再决定是否启动新后端。
 - **冷启动缓存隔离**：原生窗口首次导航绕过旧的动态首页缓存，避免重启后把启动脚本或样式文本当作页面内容。
+- **兼容官方 DSH**：缓存隔离与完整性检查全部由桌面壳完成，不要求修改、分叉或维护 DeepSeek Harness。
 - **无 CMD 弹窗**：Windows 子进程使用 `windowsHide`，stdout/stderr 在内部收集用于错误诊断。
 - **单实例**：再次启动会聚焦已有窗口，不会重复创建桌面壳。
 - **生命周期所有权**：现有服务不会被接管或结束；应用自己启动的后端会在退出时清理。
@@ -58,6 +59,8 @@ DSH Desktop 把本机 DeepSeek Harness WebUI 放进独立的原生窗口：启�
 - 默认监听地址 `http://127.0.0.1:3080`。
 
 DSH Desktop 不打包 Node、模型密钥或 DSH home。它会直接使用你现有的 DSH 安装和 `$DSH_HOME`，不会迁移或复制会话。
+
+官方发布的 DeepSeek Harness 无需额外补丁。即使 DSH 动态首页没有发送缓存控制响应头，DSH Desktop 也会使用独立探测和每次启动唯一的导航地址获取当前完整页面。
 
 ### 为什么依赖本机 Node 与 DSH
 
@@ -127,6 +130,7 @@ flowchart LR
 ```text
 src/main.js        服务探测、隐藏启动、窗口、安全导航和退出清理
 src/update.js      GitHub Release 查询与语义版本比较
+src/webui.js       完整页面校验与首次导航缓存隔离
 src/startup.html   与 WebUI 配色一致的启动及故障状态页
 assets/app-icon.png
                     安装包、快捷方式、窗口和 README 共用图标
